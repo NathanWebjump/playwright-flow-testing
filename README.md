@@ -137,3 +137,44 @@ Durante a navegação, você pode pedir ao agente para mostrar o estado atual da
 ```
 
 Isso é útil para entender por que o agente não está encontrando um elemento — talvez o componente esteja dentro de um iframe, ou o atributo `aria-label` esteja faltando.
+
+---
+
+## Arquitetura de automações
+
+Testes gerados pelo agente com uma linha de código funcionam bem para validações pontuais, mas projetos maiores precisam de uma estrutura que garanta **manutenibilidade** e **legibilidade** a longo prazo. Os dois guias abaixo cobrem as abordagens mais adotadas:
+
+### [Page Object Model (POM)](./page-object-model.md)
+
+Organiza o código criando uma camada de abstração entre os testes e a interface. Cada tela da aplicação vira uma classe TypeScript que encapsula seletores e ações, deixando os arquivos `.spec.ts` focados apenas em comportamento.
+
+**Quando usar:** projetos Playwright puros, times que preferem testes escritos diretamente em TypeScript.
+
+Destaques:
+- `BasePage.ts` com utilitários compartilhados
+- Locators declarados no construtor da classe
+- Componentes reutilizáveis em `pages/components/`
+- Boas práticas: seletores semânticos, asserções fora da Page Object, nomes de métodos no domínio do negócio
+
+### [Page Object Model com Cucumber](./page-object-cucumber.md)
+
+Combina Page Object Model com BDD (Behavior-Driven Development) usando o framework Cucumber e sintaxe Gherkin. Testes ficam legíveis por stakeholders não-técnicos, enquanto o código de automação permanece organizado nas Page Objects.
+
+**Quando usar:** times multidisciplinares (QA + PO + devs), projetos onde os critérios de aceite viram cenários de teste.
+
+Destaques:
+- Feature files `.feature` escritos em linguagem natural
+- Step definitions como "cola" entre Gherkin e TypeScript
+- `World` para compartilhar estado entre steps do mesmo cenário
+- Hooks de `Before`/`After` para setup e teardown
+- Configuração de relatórios HTML e JSON
+
+### Comparação rápida
+
+| | POM puro | POM + Cucumber |
+|---|---|---|
+| Linguagem dos testes | TypeScript | Gherkin (linguagem natural) |
+| Curva de aprendizado | Baixa | Média |
+| Legibilidade para não-devs | Moderada | Alta |
+| Dependências extras | Nenhuma | `@cucumber/cucumber`, `ts-node` |
+| Ideal para | Times de engenharia | Times multidisciplinares |
